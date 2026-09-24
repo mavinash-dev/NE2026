@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NE2026 — Northeast India Trip</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --ph0: #f59e0b;
+  --ph1: #34d399;
+  --ph2: #60a5fa;
+  --ph3: #f472b6;
+  --ph4: #a78bfa;
+  --transit: #94a3b8;
+  --bg-glass: rgba(8, 10, 18, 0.82);
+  --bg-card: rgba(12, 15, 26, 0.92);
+  --border: rgba(255,255,255,0.07);
+}
+
+body { font-family:'Inter',sans-serif; background:#080a12; color:#e2e8f0; height:100vh; overflow:hidden; }
+
+/* ── MAP ── */
+#map { position:fixed; inset:0; z-index:0; }
+
+/* ── TOP BAR ── */
+#topbar {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 24px;
+  background:linear-gradient(180deg, rgba(8,10,18,0.95) 0%, transparent 100%);
+  pointer-events:none;
+}
+#topbar-title {
+  font-family:'Space Mono',monospace;
+  font-size:12px; font-weight:700; letter-spacing:2px;
+  color:#fff; text-transform:uppercase;
+}
+#topbar-title span { color:var(--ph1); }
+#topbar-status {
+  font-family:'Space Mono',monospace; font-size:10px;
+  color:#475569; letter-spacing:1px;
+}
+#topbar-status b { color:#34d399; }
+
+/* ── SLIDE CARD ── */
+#slide-card {
+  position:fixed; left:28px; top:50%; transform:translateY(-50%);
+  z-index:100; width:340px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  backdrop-filter:blur(20px);
+  overflow:hidden;
+  transition:opacity 0.3s ease, transform 0.3s ease;
+}
+#slide-card.hidden { opacity:0; transform:translateY(-50%) translateX(-20px); pointer-events:none; }
+
+#card-phase-bar {
+  height:3px;
+  width:100%;
+  transition:background 0.4s;
+}
+#card-body { padding:24px; }
+
+#card-index {
+  font-family:'Space Mono',monospace;
+  font-size:10px; letter-spacing:2px;
+  color:#475569; text-transform:uppercase;
+  margin-bottom:6px;
+}
+#card-title {
+  font-size:22px; font-weight:700; color:#f0f4ff;
+  line-height:1.2; margin-bottom:4px;
+}
+#card-date {
+  font-family:'Space Mono',monospace;
+  font-size:11px; color:#64748b;
+  letter-spacing:1px; margin-bottom:14px;
+}
+#card-note {
+  font-size:13px; color:#94a3b8; line-height:1.65;
+  border-left:2px solid var(--border);
+  padding-left:12px;
+}
+#card-phase-label {
+  display:inline-block; margin-top:16px;
+  font-family:'Space Mono',monospace;
+  font-size:9px; letter-spacing:1.5px; text-transform:uppercase;
+  padding:4px 10px; border-radius:99px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+}
+
+/* ── NAVIGATION CONTROLS ── */
+#nav-controls {
+  position:fixed; left:28px; z-index:100;
+  display:flex; gap:10px; align-items:center;
+}
+#nav-controls { bottom:100px; }
+
+.nav-btn {
+  width:42px; height:42px; border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--bg-glass);
+  backdrop-filter:blur(12px);
+  color:#94a3b8; font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s; font-family:'Space Mono',monospace;
+}
+.nav-btn:hover { background:rgba(255,255,255,0.08); color:#fff; border-color:rgba(255,255,255,0.15); }
+.nav-btn:disabled { opacity:0.25; cursor:not-allowed; }
+
+#nav-counter {
+  font-family:'Space Mono',monospace;
+  font-size:11px; color:#475569; padding:0 6px; letter-spacing:1px;
+}
+
+/* ── BOTTOM TIMELINE ── */
+#timeline {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  padding:0 24px 20px;
+  background:linear-gradient(0deg, rgba(8,10,18,0.95) 0%, transparent 100%);
+}
+#timeline-track {
+  display:flex; align-items:center; gap:0;
+  overflow-x:auto; padding:12px 0 4px;
+  scrollbar-width:none;
+}
+#timeline-track::-webkit-scrollbar { display:none; }
+
+.tl-node {
+  display:flex; flex-direction:column; align-items:center;
+  cursor:pointer; flex-shrink:0;
+  transition:transform 0.15s;
+}
+.tl-node:hover { transform:translateY(-2px); }
+
+.tl-dot {
+  width:10px; height:10px; border-radius:50%;
+  border:2px solid currentColor;
+  background:transparent;
+  transition:all 0.2s;
+  position:relative; z-index:1;
+}
+.tl-node.active .tl-dot {
+  width:14px; height:14px;
+  background:currentColor;
+  box-shadow:0 0 12px currentColor;
+}
+.tl-label {
+  font-family:'Space Mono',monospace;
+  font-size:8px; color:#475569; margin-top:5px;
+  text-align:center; max-width:52px;
+  white-space:nowrap; overflow:hidden;
+  text-overflow:ellipsis; letter-spacing:0.5px;
+}
+.tl-node.active .tl-label { color:#e2e8f0; }
+
+.tl-line {
+  flex:1; min-width:16px; height:1px;
+  background:rgba(255,255,255,0.08);
+  position:relative; top:-8px;
+}
+.tl-line.lit { background:rgba(255,255,255,0.25); }
+
+/* ── ROUTE COUNTER ── */
+#route-info {
+  position:fixed; right:24px; bottom:80px; z-index:100;
+  font-family:'Space Mono',monospace; font-size:10px;
+  color:#334155; text-align:right; letter-spacing:1px;
+  line-height:1.8;
+}
+#route-info span { color:#475569; }
+
+/* ── INTRO OVERLAY ── */
+#intro {
+  position:fixed; inset:0; z-index:200;
+  background:rgba(8,10,18,0.96);
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:10px;
+  transition:opacity 0.6s;
+}
+#intro.gone { opacity:0; pointer-events:none; }
+#intro h1 {
+  font-family:'Space Mono',monospace;
+  font-size:clamp(20px,4vw,40px); color:#fff;
+  letter-spacing:4px; text-transform:uppercase;
+}
+#intro h1 span { color:var(--ph1); }
+#intro p { font-size:13px; color:#475569; letter-spacing:2px; text-transform:uppercase; font-family:'Space Mono',monospace; }
+#intro-dates { font-family:'Space Mono',monospace; font-size:11px; color:#334155; margin-top:8px; letter-spacing:2px; }
+#start-btn {
+  margin-top:28px; padding:12px 32px;
+  background:transparent;
+  border:1px solid rgba(52,211,153,0.4);
+  border-radius:8px; color:#34d399;
+  font-family:'Space Mono',monospace; font-size:12px;
+  letter-spacing:2px; text-transform:uppercase;
+  cursor:pointer; transition:all 0.2s;
+}
+#start-btn:hover { background:rgba(52,211,153,0.08); border-color:#34d399; box-shadow:0 0 20px rgba(52,211,153,0.15); }
+
+/* ── SCANLINE subtle overlay ── */
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:50;
+  background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+  <p>// personal mission log</p>
+  <h1>NE<span>2026</span></h1>
+  <div id="intro-dates">NOV 21 &mdash; DEC 10 &nbsp;·&nbsp; 20 DAYS &nbsp;·&nbsp; 5 STATES</div>
+  <p style="margin-top:4px; font-size:10px;">northeast india circuit</p>
+  <button id="start-btn" onclick="launchMap()">INITIALIZE ROUTE &rarr;</button>
+</div>
+
+<div id="map"></div>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div id="topbar-title">NE<span>2026</span> &mdash; Northeast India Circuit</div>
+  <div id="topbar-status">STATUS: <b>ROUTE ACTIVE</b> &nbsp;·&nbsp; NOV 21 – DEC 10</div>
+</div>
+
+<!-- SLIDE CARD -->
+<div id="slide-card" class="hidden">
+  <div id="card-phase-bar"></div>
+  <div id="card-body">
+    <div id="card-index"></div>
+    <div id="card-title"></div>
+    <div id="card-date"></div>
+    <div id="card-note"></div>
+    <div id="card-phase-label"></div>
+  </div>
+</div>
+
+<!-- NAV CONTROLS -->
+<div id="nav-controls">
+  <button class="nav-btn" id="btn-prev" onclick="navigate(-1)">&#8592;</button>
+  <span id="nav-counter">01 / 15</span>
+  <button class="nav-btn" id="btn-next" onclick="navigate(1)">&#8594;</button>
+</div>
+
+<!-- BOTTOM TIMELINE -->
+<div id="timeline">
+  <div id="timeline-track"></div>
+</div>
+
+<!-- ROUTE INFO -->
+<div id="route-info">
+  <div>CHECKPOINTS &nbsp;<span id="ri-nodes">—</span></div>
+  <div>PHASE &nbsp;<span id="ri-phase">—</span></div>
+</div>
+
+<script>
+const STOPS = [
+  { lat:23.8315, lng:91.2868,  n:"Agartala",              date:"Nov 21, night",       note:"Friend's marriage. Board train 15649 Kanchanjunga Express at 21:30 → Guwahati.",   phase:"START", color:"#f59e0b", zoom:11 },
+  { lat:26.1445, lng:91.7362,  n:"Guwahati",              date:"Nov 22, ~11:30 AM",   note:"Arrive from Agartala. Central hub visited 3× this trip. Shared taxi → Cherrapunji (3.5 hrs).", phase:"MEGHALAYA", color:"#34d399", zoom:11 },
+  { lat:25.2844, lng:91.7159,  n:"Cherrapunji",           date:"Nov 22 eve – 23",     note:"Base for Meghalaya. Wettest place on Earth. Nohkalikai Falls viewpoint at dusk.",  phase:"MEGHALAYA", color:"#34d399", zoom:12 },
+  { lat:25.2022, lng:91.7240,  n:"Nongriat + Rainbow Falls", date:"Nov 23, 6 AM start", note:"3,500 steps ↓ Double Decker Living Root Bridge → Rainbow Falls → 3,500 steps ↑. 10–12 hr endurance day.", phase:"MEGHALAYA", color:"#34d399", zoom:13 },
+  { lat:25.1883, lng:92.0184,  n:"Dawki + Mawlynnong",   date:"Nov 24",              note:"Umngot River — glass-clear boat ride. Mawlynnong, Asia's cleanest village. Return to Guwahati overnight.", phase:"MEGHALAYA", color:"#34d399", zoom:12 },
+  { lat:26.7271, lng:88.3953,  n:"Siliguri / NJP",        date:"Nov 25, ~7:30 PM",    note:"Train 15676 Saraighat Exp from Guwahati 10:30 AM. Friend meetup. Gateway to Sikkim.", phase:"SIKKIM", color:"#60a5fa", zoom:11 },
+  { lat:27.3389, lng:88.6065,  n:"Gangtok",               date:"Nov 26 – 29",         note:"Shared jeep from NJP (3.5 hrs). Arrange Nathu La + North Sikkim permits on arrival.", phase:"SIKKIM", color:"#60a5fa", zoom:12 },
+  { lat:27.3761, lng:88.7525,  n:"Tsomgo + Nathu La",     date:"Nov 27",              note:"Tsomgo Lake at 3,753 m. Nathu La Pass at 4,310 m — standing at the India–China border.", phase:"SIKKIM", color:"#60a5fa", zoom:12 },
+  { lat:27.6877, lng:88.5678,  n:"Lachung → Yumthang",   date:"Nov 28 – 29",         note:"North Sikkim: overnight at Lachung → Yumthang Valley of Flowers at 3,564 m. Depart Nov 29 evening.", phase:"SIKKIM", color:"#60a5fa", zoom:11 },
+  { lat:26.7271, lng:88.3953,  n:"NJP → Guwahati (Transit)", date:"Nov 29 night",    note:"Train 15675 NJP 11:30 PM → Guwahati 8:30 AM. Then Nagaland Express 23:30 → Dimapur 5:10 AM Dec 1.", phase:"TRANSIT", color:"#94a3b8", zoom:7 },
+  { lat:25.6714, lng:94.1086,  n:"Kohima",                date:"Dec 1, arrive ~9 AM", note:"Shared sumo from Dimapur (₹400, 3 hrs). Arrive in time for Hornbill opening ceremony.", phase:"NAGALAND", color:"#f472b6", zoom:12 },
+  { lat:25.6461, lng:94.0812,  n:"Kisama — Hornbill Opening", date:"Dec 1",          note:"Grand tribal parade — all 17 Naga tribes. Nagaland Statehood Day. The most immersive cultural spectacle in the Northeast.", phase:"NAGALAND", color:"#f472b6", zoom:13 },
+  { lat:25.5538, lng:94.0862,  n:"Dzukou Valley Trek",    date:"Dec 2 – 3",           note:"From Viswema village. 2-day overnight trek. One of Northeast India's finest high-altitude valley treks.", phase:"NAGALAND", color:"#f472b6", zoom:12 },
+  { lat:25.6461, lng:94.0812,  n:"Hornbill Music Night",  date:"Dec 4 evening",       note:"Peak night at Hornbill. Live rock + folk fusion under the Naga hills. Leave Dec 4 late night → Dimapur.", phase:"NAGALAND", color:"#f472b6", zoom:13 },
+  { lat:26.5775, lng:93.1711,  n:"Kaziranga NP",          date:"Dec 5 – 6",           note:"ASTC bus from Guwahati (₹380, 3 hrs). Elephant safari at dawn + jeep safari. World's highest density of one-horned rhinos.", phase:"ASSAM", color:"#a78bfa", zoom:11 },
+];
+
+const PHASE_LABELS = {
+  "START": "⚑ Start — Marriage",
+  "MEGHALAYA": "Phase 1 — Meghalaya (Solo)",
+  "SIKKIM": "Phase 2 — Sikkim (With Friend)",
+  "TRANSIT": "↝ Overnight Transit",
+  "NAGALAND": "Phase 3 — Nagaland (Solo)",
+  "ASSAM": "Phase 4 — Assam (Solo)"
+};
+
+const ROUTES = [
+  [0,1],[1,2],[2,3],[3,4],[4,1],[1,5],[5,6],[6,7],[7,8],[8,5],[5,9],[9,10],[10,11],[11,12],[12,13],[13,14]
+];
+
+let map, markers=[], polylines=[], activeIdx=0, mapReady=false;
+
+function launchMap() {
+  document.getElementById('intro').classList.add('gone');
+  if (mapReady) showSlide(0);
+}
+
+function initMap() {
+  const dark = [
+    {elementType:"geometry",stylers:[{color:"#080a12"}]},
+    {elementType:"labels.text.fill",stylers:[{color:"#334155"}]},
+    {elementType:"labels.text.stroke",stylers:[{color:"#080a12"}]},
+    {featureType:"administrative",elementType:"geometry.stroke",stylers:[{color:"#1e2235"}]},
+    {featureType:"administrative.land_parcel",stylers:[{visibility:"off"}]},
+    {featureType:"landscape",elementType:"geometry",stylers:[{color:"#0d1020"}]},
+    {featureType:"landscape.natural",elementType:"geometry",stylers:[{color:"#0a1525"}]},
+    {featureType:"poi",stylers:[{visibility:"off"}]},
+    {featureType:"road",elementType:"geometry",stylers:[{color:"#1a1f35"}]},
+    {featureType:"road.arterial",elementType:"geometry",stylers:[{color:"#1e2540"}]},
+    {featureType:"road.highway",elementType:"geometry",stylers:[{color:"#243050"}]},
+    {featureType:"road.highway",elementType:"labels",stylers:[{visibility:"off"}]},
+    {featureType:"transit",stylers:[{visibility:"off"}]},
+    {featureType:"water",elementType:"geometry",stylers:[{color:"#050c1f"}]},
+    {featureType:"water",elementType:"labels.text.fill",stylers:[{color:"#1e3a5f"}]},
+  ];
+
+  map = new google.maps.Map(document.getElementById('map'), {
+    center:{lat:26.5, lng:91.5}, zoom:6,
+    styles: dark,
+    disableDefaultUI: true,
+    zoomControl: false,
+  });
+
+  // Draw all route polylines (dim)
+  ROUTES.forEach(([a,b]) => {
+    const pl = new google.maps.Polyline({
+      path:[{lat:STOPS[a].lat,lng:STOPS[a].lng},{lat:STOPS[b].lat,lng:STOPS[b].lng}],
+      strokeColor:'#1e2540', strokeOpacity:0.6, strokeWeight:1.5,
+      map, icons:[{icon:{path:'M 0,-1 0,1',strokeOpacity:1,scale:2},offset:'0',repeat:'8px'}]
+    });
+    polylines.push(pl);
+  });
+
+  // Create markers
+  STOPS.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'custom-marker';
+    div.innerHTML = `<div class="cm-outer" style="--c:${s.color}"><div class="cm-inner">${i+1}</div></div>`;
+    div.addEventListener('click', () => showSlide(i));
+
+    const ov = new google.maps.marker.AdvancedMarkerElement({
+      position:{lat:s.lat, lng:s.lng}, map, content:div,
+      title:s.n
+    });
+    markers.push({ov, div});
+  });
+
+  buildTimeline();
+  mapReady = true;
+  if (!document.getElementById('intro').classList.contains('gone')) return;
+  showSlide(0);
+}
+
+const markerCSS = `
+.cm-outer { width:28px;height:28px;border-radius:50%;border:2px solid var(--c);display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer;background:rgba(8,10,18,0.9); }
+.cm-outer:hover,.cm-outer.active { background:var(--c);box-shadow:0 0 14px var(--c); }
+.cm-inner { font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--c); }
+.cm-outer.active .cm-inner { color:#080a12; }
+`;
+const styleEl = document.createElement('style');
+styleEl.textContent = markerCSS;
+document.head.appendChild(styleEl);
+
+function buildTimeline() {
+  const track = document.getElementById('timeline-track');
+  STOPS.forEach((s, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'tl-line'; line.id = `tl-line-${i}`;
+      track.appendChild(line);
+    }
+    const node = document.createElement('div');
+    node.className = 'tl-node'; node.id = `tl-node-${i}`;
+    node.style.color = s.color;
+    node.innerHTML = `<div class="tl-dot"></div><div class="tl-label">${s.n.split(' ')[0]}</div>`;
+    node.addEventListener('click', () => showSlide(i));
+    track.appendChild(node);
+  });
+}
+
+function showSlide(idx) {
+  const s = STOPS[idx];
+  activeIdx = idx;
+
+  // Fly map
+  map.panTo({lat:s.lat, lng:s.lng});
+  map.setZoom(s.zoom || 10);
+
+  // Update card
+  const card = document.getElementById('slide-card');
+  card.classList.add('hidden');
+  setTimeout(() => {
+    document.getElementById('card-phase-bar').style.background = s.color;
+    document.getElementById('card-index').textContent = `// checkpoint ${String(idx+1).padStart(2,'0')} of ${STOPS.length}`;
+    document.getElementById('card-title').textContent = s.n;
+    document.getElementById('card-date').textContent = s.date;
+    document.getElementById('card-note').textContent = s.note;
+    const pl = document.getElementById('card-phase-label');
+    pl.textContent = PHASE_LABELS[s.phase] || s.phase;
+    pl.style.color = s.color;
+    pl.style.borderColor = s.color + '44';
+    card.classList.remove('hidden');
+  }, 200);
+
+  // Update markers
+  markers.forEach((m, i) => {
+    const outer = m.div.querySelector('.cm-outer');
+    if (i === idx) outer.classList.add('active');
+    else outer.classList.remove('active');
+  });
+
+  // Update timeline
+  STOPS.forEach((_, i) => {
+    const node = document.getElementById(`tl-node-${i}`);
+    if (node) i === idx ? node.classList.add('active') : node.classList.remove('active');
+    if (i > 0) {
+      const line = document.getElementById(`tl-line-${i}`);
+      if (line) i <= idx ? line.classList.add('lit') : line.classList.remove('lit');
+    }
+  });
+  document.getElementById(`tl-node-${idx}`)?.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+
+  // Highlight active route segments
+  ROUTES.forEach(([a,b], ri) => {
+    const isActive = a <= idx && b <= idx;
+    polylines[ri].setOptions({
+      strokeColor: isActive ? STOPS[b].color : '#1e2540',
+      strokeOpacity: isActive ? 0.75 : 0.5,
+      strokeWeight: isActive ? 2.5 : 1.5,
+    });
+  });
+
+  // Nav counter + route info
+  document.getElementById('nav-counter').textContent = `${String(idx+1).padStart(2,'0')} / ${String(STOPS.length).padStart(2,'0')}`;
+  document.getElementById('btn-prev').disabled = idx === 0;
+  document.getElementById('btn-next').disabled = idx === STOPS.length - 1;
+  document.getElementById('ri-nodes').textContent = `${idx+1} / ${STOPS.length}`;
+  document.getElementById('ri-phase').textContent = s.phase;
+}
+
+function navigate(dir) {
+  const next = activeIdx + dir;
+  if (next >= 0 && next < STOPS.length) showSlide(next);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate(-1);
+});
+</script>
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=%%MAPS_API_KEY%%&callback=initMap&libraries=marker">
+</script>
+</body>
+</html>
