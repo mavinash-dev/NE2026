@@ -263,21 +263,21 @@ body::after {
 
 <script>
 const STOPS = [
-  { lat:23.8315, lng:91.2868,  n:"Agartala",              date:"Nov 21, night",       note:"Friend's marriage. Board train 15649 Kanchanjunga Express at 21:30 → Guwahati.",   phase:"START", color:"#f59e0b", zoom:11 },
-  { lat:26.1445, lng:91.7362,  n:"Guwahati",              date:"Nov 22, ~11:30 AM",   note:"Arrive from Agartala. Central hub visited 3× this trip. Shared taxi → Cherrapunji (3.5 hrs).", phase:"MEGHALAYA", color:"#34d399", zoom:11 },
-  { lat:25.2844, lng:91.7159,  n:"Cherrapunji",           date:"Nov 22 eve – 23",     note:"Base for Meghalaya. Wettest place on Earth. Nohkalikai Falls viewpoint at dusk.",  phase:"MEGHALAYA", color:"#34d399", zoom:12 },
-  { lat:25.2022, lng:91.7240,  n:"Nongriat + Rainbow Falls", date:"Nov 23, 6 AM start", note:"3,500 steps ↓ Double Decker Living Root Bridge → Rainbow Falls → 3,500 steps ↑. 10–12 hr endurance day.", phase:"MEGHALAYA", color:"#34d399", zoom:13 },
-  { lat:25.1883, lng:92.0184,  n:"Dawki + Mawlynnong",   date:"Nov 24",              note:"Umngot River — glass-clear boat ride. Mawlynnong, Asia's cleanest village. Return to Guwahati overnight.", phase:"MEGHALAYA", color:"#34d399", zoom:12 },
-  { lat:26.7271, lng:88.3953,  n:"Siliguri / NJP",        date:"Nov 25, ~7:30 PM",    note:"Train 15676 Saraighat Exp from Guwahati 10:30 AM. Friend meetup. Gateway to Sikkim.", phase:"SIKKIM", color:"#60a5fa", zoom:11 },
-  { lat:27.3389, lng:88.6065,  n:"Gangtok",               date:"Nov 26 – 29",         note:"Shared jeep from NJP (3.5 hrs). Arrange Nathu La + North Sikkim permits on arrival.", phase:"SIKKIM", color:"#60a5fa", zoom:12 },
-  { lat:27.3761, lng:88.7525,  n:"Tsomgo + Nathu La",     date:"Nov 27",              note:"Tsomgo Lake at 3,753 m. Nathu La Pass at 4,310 m — standing at the India–China border.", phase:"SIKKIM", color:"#60a5fa", zoom:12 },
-  { lat:27.6877, lng:88.5678,  n:"Lachung → Yumthang",   date:"Nov 28 – 29",         note:"North Sikkim: overnight at Lachung → Yumthang Valley of Flowers at 3,564 m. Depart Nov 29 evening.", phase:"SIKKIM", color:"#60a5fa", zoom:11 },
-  { lat:26.7271, lng:88.3953,  n:"NJP → Guwahati (Transit)", date:"Nov 29 night",    note:"Train 15675 NJP 11:30 PM → Guwahati 8:30 AM. Then Nagaland Express 23:30 → Dimapur 5:10 AM Dec 1.", phase:"TRANSIT", color:"#94a3b8", zoom:7 },
-  { lat:25.6714, lng:94.1086,  n:"Kohima",                date:"Dec 1, arrive ~9 AM", note:"Shared sumo from Dimapur (₹400, 3 hrs). Arrive in time for Hornbill opening ceremony.", phase:"NAGALAND", color:"#f472b6", zoom:12 },
-  { lat:25.6461, lng:94.0812,  n:"Kisama — Hornbill Opening", date:"Dec 1",          note:"Grand tribal parade — all 17 Naga tribes. Nagaland Statehood Day. The most immersive cultural spectacle in the Northeast.", phase:"NAGALAND", color:"#f472b6", zoom:13 },
-  { lat:25.5538, lng:94.0862,  n:"Dzukou Valley Trek",    date:"Dec 2 – 3",           note:"From Viswema village. 2-day overnight trek. One of Northeast India's finest high-altitude valley treks.", phase:"NAGALAND", color:"#f472b6", zoom:12 },
-  { lat:25.6461, lng:94.0812,  n:"Hornbill Music Night",  date:"Dec 4 evening",       note:"Peak night at Hornbill. Live rock + folk fusion under the Naga hills. Leave Dec 4 late night → Dimapur.", phase:"NAGALAND", color:"#f472b6", zoom:13 },
-  { lat:26.5775, lng:93.1711,  n:"Kaziranga NP",          date:"Dec 5 – 6",           note:"ASTC bus from Guwahati (₹380, 3 hrs). Elephant safari at dawn + jeep safari. World's highest density of one-horned rhinos.", phase:"ASSAM", color:"#a78bfa", zoom:11 },
+  { lat:23.8315, lng:91.2868,  n:"Agartala",                  date:"Nov 21, night",        note:"Tripura capital. Attending a friend's marriage — the reason this whole journey begins.",                                  phase:"START",     color:"#f59e0b", zoom:11 },
+  { lat:26.1445, lng:91.7362,  n:"Guwahati",                  date:"Nov 22",               note:"Assam's largest city and the central hub of Northeast India. Gateway to every phase of this trip.",                        phase:"MEGHALAYA", color:"#34d399", zoom:11 },
+  { lat:25.2844, lng:91.7159,  n:"Cherrapunji",               date:"Nov 22 – 23",          note:"One of the wettest places on Earth. Base for Meghalaya exploration — Nohkalikai Falls, canyon views, misty cliffs.",      phase:"MEGHALAYA", color:"#34d399", zoom:12 },
+  { lat:25.2022, lng:91.7240,  n:"Nongriat + Rainbow Falls",  date:"Nov 23",               note:"The iconic 3,500-step descent to the Double Decker Living Root Bridge — grown over centuries by the Khasi tribe. Continue to Rainbow Falls, the hidden payoff at the end.",  phase:"MEGHALAYA", color:"#34d399", zoom:13 },
+  { lat:25.1883, lng:92.0184,  n:"Dawki + Mawlynnong",        date:"Nov 24",               note:"Umngot River — so clear the boats appear to float on air. Then Mawlynnong, a Khasi village famous for being the cleanest in Asia.", phase:"MEGHALAYA", color:"#34d399", zoom:12 },
+  { lat:26.7271, lng:88.3953,  n:"Siliguri / NJP",            date:"Nov 25",               note:"West Bengal plains — meeting point with a friend before heading into the mountains. Gateway to Sikkim and the Eastern Himalayas.", phase:"SIKKIM", color:"#60a5fa", zoom:11 },
+  { lat:27.3389, lng:88.6065,  n:"Gangtok",                   date:"Nov 26 – 29",          note:"Sikkim's capital, perched at 1,650 m with views of Kanchenjunga. Base for all mountain excursions — permit hub for restricted areas.", phase:"SIKKIM", color:"#60a5fa", zoom:12 },
+  { lat:27.3761, lng:88.7525,  n:"Tsomgo + Nathu La",         date:"Nov 27",               note:"Tsomgo Lake at 3,753 m — a sacred glacial lake. Nathu La Pass at 4,310 m — the historic Silk Road crossing and India–China border.", phase:"SIKKIM", color:"#60a5fa", zoom:12 },
+  { lat:27.6877, lng:88.5678,  n:"Lachung → Yumthang",        date:"Nov 28 – 29",          note:"North Sikkim: overnight in Lachung village at 2,700 m. Next morning — Yumthang Valley of Flowers at 3,564 m, surrounded by rhododendron forests.", phase:"SIKKIM", color:"#60a5fa", zoom:11 },
+  { lat:26.7271, lng:88.3953,  n:"Transit — Sikkim to Nagaland", date:"Nov 29 night",      note:"Overnight journey across the Northeast — leaving the Himalayas, heading to the Naga hills in time for the festival.",        phase:"TRANSIT",   color:"#94a3b8", zoom:7  },
+  { lat:25.6714, lng:94.1086,  n:"Kohima",                    date:"Dec 1",                note:"Capital of Nagaland, perched at 1,444 m. A city shaped by WWII history, tribal culture, and the world's most unique festival.",  phase:"NAGALAND",  color:"#f472b6", zoom:12 },
+  { lat:25.6461, lng:94.0812,  n:"Kisama — Hornbill Opening", date:"Dec 1",                note:"All 17 Naga tribes gather in traditional dress for the grand parade. Nagaland's Statehood Day. The most culturally dense single day in the entire Northeast.", phase:"NAGALAND", color:"#f472b6", zoom:13 },
+  { lat:25.5538, lng:94.0862,  n:"Dzukou Valley Trek",        date:"Dec 2 – 3",            note:"High-altitude valley trek starting from Viswema village. Overnight camp inside the valley — carpeted in seasonal flowers, ringed by Naga peaks.", phase:"NAGALAND", color:"#f472b6", zoom:12 },
+  { lat:25.6461, lng:94.0812,  n:"Hornbill Music Night",      date:"Dec 4 evening",        note:"The peak night of Hornbill — a raw fusion of Naga folk, rock, and metal under open skies. One of India's most underrated live music experiences.", phase:"NAGALAND", color:"#f472b6", zoom:13 },
+  { lat:26.5775, lng:93.1711,  n:"Kaziranga National Park",   date:"Dec 5 – 6",            note:"Assam's crown jewel. Elephant safari at dawn through tall elephant grass. Jeep safari at dusk. Highest density of one-horned rhinos on Earth. UNESCO World Heritage Site.", phase:"ASSAM", color:"#a78bfa", zoom:11 },
 ];
 
 const PHASE_LABELS = {
@@ -336,18 +336,31 @@ function initMap() {
     polylines.push(pl);
   });
 
-  // Create markers
+  // Create markers using OverlayView for custom HTML (no Map ID required)
   STOPS.forEach((s, i) => {
-    const div = document.createElement('div');
-    div.className = 'custom-marker';
-    div.innerHTML = `<div class="cm-outer" style="--c:${s.color}"><div class="cm-inner">${i+1}</div></div>`;
-    div.addEventListener('click', () => showSlide(i));
-
-    const ov = new google.maps.marker.AdvancedMarkerElement({
-      position:{lat:s.lat, lng:s.lng}, map, content:div,
-      title:s.n
-    });
-    markers.push({ov, div});
+    class CustomMarker extends google.maps.OverlayView {
+      constructor(pos, color, label) {
+        super();
+        this.pos = pos; this.color = color; this.label = label;
+        this.div = null;
+      }
+      onAdd() {
+        this.div = document.createElement('div');
+        this.div.style.cssText = 'position:absolute;cursor:pointer;transform:translate(-50%,-50%)';
+        this.div.innerHTML = `<div class="cm-outer" style="--c:${this.color}"><div class="cm-inner">${this.label}</div></div>`;
+        this.div.addEventListener('click', () => showSlide(i));
+        this.getPanes().overlayMouseTarget.appendChild(this.div);
+      }
+      draw() {
+        const proj = this.getProjection();
+        const pt = proj.fromLatLngToDivPixel(this.pos);
+        if (pt && this.div) { this.div.style.left = pt.x+'px'; this.div.style.top = pt.y+'px'; }
+      }
+      onRemove() { if (this.div) { this.div.parentNode.removeChild(this.div); this.div = null; } }
+    }
+    const cm = new CustomMarker(new google.maps.LatLng(s.lat, s.lng), s.color, i+1);
+    cm.setMap(map);
+    markers.push(cm);
   });
 
   buildTimeline();
@@ -409,9 +422,9 @@ function showSlide(idx) {
 
   // Update markers
   markers.forEach((m, i) => {
+    if (!m.div) return;
     const outer = m.div.querySelector('.cm-outer');
-    if (i === idx) outer.classList.add('active');
-    else outer.classList.remove('active');
+    if (outer) i === idx ? outer.classList.add('active') : outer.classList.remove('active');
   });
 
   // Update timeline
@@ -454,7 +467,7 @@ document.addEventListener('keydown', e => {
 });
 </script>
 <script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=%%MAPS_API_KEY%%&callback=initMap&libraries=marker">
+  src="https://maps.googleapis.com/maps/api/js?key=%%MAPS_API_KEY%%&callback=initMap">
 </script>
 </body>
 </html>
